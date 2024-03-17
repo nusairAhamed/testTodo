@@ -4,7 +4,7 @@ import { Header } from "./components/header/header";
 import { Card } from "./components/Card/Card";
 import { Footer } from "./components/Footer/Footer";
 import { useState } from "react";
-import { ButtonAdd } from "./components/ButtonAdd/ButtonAdd";
+import { AddItemButton } from "./components/AddItemButton/AddItemButton";
 import Dialog from "react-native-dialog";
 import uuid from "react-native-uuid";
 
@@ -12,6 +12,7 @@ export default function App() {
   const [todoList, SetTodoList] = useState([
     { id: 1, title: "Learn HTML", isComplete: false },
     { id: 2, title: "Learn CSS", isComplete: false },
+
     { id: 3, title: "Learn JS", isComplete: false },
 
     { id: 4, title: "Learn React Native", isComplete: true },
@@ -27,8 +28,8 @@ export default function App() {
   };
 
   const [activeTab, SetActiveTab] = useState("all");
-  const [showAddNewModal, SetShowAddNewModal] = useState(false);
-  const [taskName, SetTaskName] = useState("");
+  const [isAddNewModalActive, SetIsAddNewModalActive] = useState(false);
+  const [addNewCardValue, SetAddNewCardValue] = useState("");
 
   const changeActiveTab = (tabValue) => SetActiveTab(tabValue);
 
@@ -57,35 +58,14 @@ export default function App() {
     ]);
   };
 
-  const addNewTask = () => {
-    const newData = { id: uuid.v4(), title: taskName, isComplete: false };
-    SetTodoList([...todoList, newData]);
-    SetShowAddNewModal(false);
-  };
-
-  const ShowAddNewModal = () => {
-    return (
-      <View>
-        <Dialog.Container
-          visible={showAddNewModal}
-          onBackdropPress={() => SetShowAddNewModal(false)}
-        >
-          <Dialog.Title>Account delete</Dialog.Title>
-          <Dialog.Description>
-            Do you want to delete this account? You cannot undo this action.
-          </Dialog.Description>
-          <Dialog.Input
-            placeholder="Enter your task name here"
-            onChangeText={SetTaskName}
-          />
-          <Dialog.Button
-            label="Cancel"
-            onPress={() => SetShowAddNewModal(false)}
-          />
-          <Dialog.Button label="Save" onPress={() => addNewTask()} />
-        </Dialog.Container>
-      </View>
-    );
+  const addNewCard = () => {
+    const newItem = {
+      id: uuid.v4(),
+      title: addNewCardValue,
+      isComplete: false,
+    };
+    SetTodoList([...todoList, newItem]);
+    SetIsAddNewModalActive(false);
   };
 
   return (
@@ -104,8 +84,9 @@ export default function App() {
             />
           ))}
         </ScrollView>
-        <ButtonAdd addNewTask={() => SetShowAddNewModal(true)} />
+        <AddItemButton btnClick={() => SetIsAddNewModalActive(true)} />
       </View>
+
       <View style={styles.footer}>
         <Footer
           activeTab={activeTab}
@@ -113,7 +94,28 @@ export default function App() {
           data={todoList}
         />
       </View>
-      {ShowAddNewModal()}
+      <View>
+        <Dialog.Container visible={isAddNewModalActive}>
+          <Dialog.Title>Add New Todo</Dialog.Title>
+          <Dialog.Description>
+            Do you want to Create New Todo ?.
+          </Dialog.Description>
+          <Dialog.Input
+            placeholder="Enter your new todo"
+            onChangeText={(text) => SetAddNewCardValue(text)}
+          />
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => SetIsAddNewModalActive(false)}
+          />
+          <Dialog.Button
+            label="Save"
+            onPress={() => {
+              addNewCard();
+            }}
+          />
+        </Dialog.Container>
+      </View>
     </SafeAreaView>
   );
 }
